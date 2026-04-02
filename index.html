@@ -1,196 +1,114 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MMSCE Smart Attendance Portal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMSCE Attendance Portal</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; text-align: center; }
-        #welcomeScreen, #successScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a2a6c; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
-        .enter-btn { background: #f1c40f; color: #1a2a6c; border: none; padding: 18px 45px; font-size: 1.2rem; font-weight: bold; border-radius: 50px; cursor: pointer; margin-top: 20px; }
-        .view-btn { background: #ffffff; color: #1a2a6c; border: none; padding: 12px 30px; font-size: 1rem; font-weight: bold; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 20px; }
-        .header { background: white; padding: 15px; border-radius: 0 0 15px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; position: sticky; top: 0; z-index: 1000; }
-        .quote-text { font-style: italic; font-size: 1.1rem; margin: 25px 0; color: #f1c40f; max-width: 95%; line-height: 1.5; }
-        #locationStatus { font-weight: bold; margin: 10px auto; padding: 12px; border-radius: 8px; max-width: 90%; font-size: 0.85rem; }
-        .on-campus { background: #d4edda; color: #155724; }
-        .off-campus { background: #f8d7da; color: #721c24; }
-        .waiting { background: #fff3cd; color: #856404; }
-        .search-container { padding: 0 15px 15px 15px; }
-        #studentSearch { width: 100%; max-width: 500px; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 15px; }
-        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; border: 1px solid #eee; }
-        .name-text { flex-grow: 1; text-align: left; font-weight: bold; font-size: 0.95rem; color: #2c3e50; }
-        .btn-p { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #eef2f3; padding: 20px; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .quote { font-style: italic; color: #555; margin: 15px 0; font-size: 0.95em; min-height: 40px; border-left: 4px solid #27ae60; padding-left: 10px; text-align: left; }
+        select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; }
+        .btn-p { background-color: #27ae60; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-view { background-color: #3498db; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 20px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .warning { color: #e74c3c; font-weight: bold; display: block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="welcomeScreen">
-    <h1>Welcome to MMSCE</h1>
-    <h2 style="font-size: 1.2rem; opacity: 0.9;">B.Ed Semester-2, 2026</h2>
-    <p id="timeWarning" style="color: #f1c40f; font-weight: bold; margin-top: 15px;"></p>
-    <button id="mainEnterBtn" class="enter-btn" onclick="startSystem()">Mark Your Attendance</button>
-</div>
-
-<div id="successScreen" style="display:none;">
-    <div style="font-size: 60px;">✅</div>
-    <h1>Attendance Recorded!</h1>
-    <div id="quoteDisplay" class="quote-text"></div>
-    <a href="https://docs.google.com/spreadsheets/d/1znoFpVPLCPlpBjCs96-WHHVt9HLkEaI4864uIK56xrU/edit?usp=drivesdk" target="_blank" class="view-btn">📊 View Attendance Sheet</a>
-</div>
-
-<div id="mainContent" style="display:none;">
-    <div class="header">
-        <h2 style="font-size: 1.1rem; color:#1a2a6c;">Smt. M. M. Shah College of Education</h2>
-        <div id="locationStatus" class="waiting">🔄 Verifying Location...</div>
-    </div>
-    <div class="search-container">
-        <input type="text" id="studentSearch" placeholder="Search your name or number..." onkeyup="filterStudents()">
-    </div>
-    <div id="attendanceGrid" class="grid"></div>
+<div class="container">
+    <h2 style="margin-bottom:5px;">MMSCE Portal</h2>
+    <p style="color:#7f8c8d; margin-top:0;">Smt. M. M. Shah College of Education</p>
+    
+    <div id="quoteDisplay" class="quote">"Loading inspiration..."</div>
+    <hr>
+    
+    <span id="timeWarning" class="warning"></span>
+    
+    <select id="studentSelect">
+        <option value="">-- Select Your Name --</option>
+        <option>1 BAMBHANIYA VARUN</option><option>2 BARAIYA RAMDEV</option><option>3 BAVLIYA JAYDEEPBHAI</option>
+        <option>4 BHADANIYA RITAXI</option><option>5 BHUVA YAISHA</option><option>6 CHATUR SNEHA</option>
+        <option>7 CHAUHAN KRISHNA</option><option>8 CHAUHAN SMITKUMAR</option><option>9 CHAVDA YASH</option>
+        <option>10 DALOLIYA SHILPABEN</option><option>11 DAXINI HETVI</option><option>12 Dumadiya Sanjay</option>
+        <option>13 GADHVI HINAL</option><option>15 Gami Rahul</option><option>16 GOSAI POOJA</option>
+        <option>17 JAMBUKIYA ASMITABEN</option><option>18 Janadiya Dhiraj</option><option>19 KHAKHI MITALBEN</option>
+        <option>20 LIMBADIYA KOMALBEN</option><option>21 MAHERIYA VARSHABEN</option><option>22 MAHERIYA YOGESHKUMAR</option>
+        <option>23 MAKWANA DOLLY</option><option>24 MALAKIYA SWITYBEN</option><option>25 MANANI ALKABEN</option>
+        <option>26 MANSURI ARMAN</option><option>27 Mehta Vishvaben</option><option>28 MITHAPARA VANRAJBHAI</option>
+        <option>29 MORI MANSHI</option><option>30 NAKIYA GEETABEN</option><option>31 NAKIYA NIKITABEN</option>
+        <option>32 NAKIYA SIDDHIBEN</option><option>33 PALANI JAHANVIBEN</option><option>34 Parmar Aman</option>
+        <option>35 PARMAR ARTI</option><option>36 PARMAR RESHMA</option><option>37 RANA MADHAVSINH</option>
+        <option>38 RATHOD KISMATBEN</option><option>39 RATHOD NARENDRABHAI</option><option>40 JADAV PRIYABEN</option>
+        <option>41 Rojasara Kinjal</option><option>42 SARVAIYA JAYESH</option><option>43 SATANI AASHISHKUMAR</option>
+        <option>44 SOLANKI HITIXA</option><option>45 SOLANKI JAYSHRIBEN</option><option>46 SOLANKI VAIBHAV</option>
+        <option>47 Sumra Farhin</option><option>48 THIM ZEEYA</option><option>49 CHAUHAN TEJASHREEBEN</option>
+        <option>50 TRIVEDI NISHTHA</option><option>51 VAGHELA DEVANSHIBA</option><option>52 Vakhariya Dhara</option>
+        <option>53 ZALA KOMALBA</option>
+    </select>
+    
+    <button id="mainBtn" class="btn-p" onclick="getLocation()">Mark Presence (P)</button>
+    
+    <a href="https://script.google.com/macros/s/AKfycbzn2SCJpeBna2dJYB-tRvtxnx2yRz3LvA_XIh73lN1p03m3XmLoga4NEtgqH6S5DzJH/exec" target="_blank" class="btn-view">View Attendance Sheet</a>
+    
+    <div id="statusMsg" style="margin-top:15px; font-weight:bold;"></div>
 </div>
 
 <script>
-    // ==========================================
-    // STEP 1: SET YOUR TIMINGS HERE (MANUAL EDIT)
-    // ==========================================
-    const SATURDAY_START = 8.0;   // 8:00 AM
-    const SATURDAY_END   = 19.5;   // 9:30 AM
-    const WEEKDAY_START  = 11.25; // 11:15 AM
-    const WEEKDAY_END    = 16.5;  // 12:30 PM
-    const CLOSE_ON_SUNDAY = true; 
-    // ==========================================
+    const SCRIPT_URL = "PASTE_YOUR_NEW_APPS_SCRIPT_URL_HERE";
+    
+    const quotes = [
+        "Education is the most powerful weapon which you can use to change the world.",
+        "The beautiful thing about learning is that no one can take it away from you.",
+        "Success is the sum of small efforts, repeated day in and day out.",
+        "Teachers open the door, but you must enter by yourself.",
+        "The expert in anything was once a beginner."
+    ];
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4qjqBG_KP90STQIMmJiOkZnfyt_XZRPqou4b94Bt91wTygeAw8X5ich5cDlomUMDV/exec";
-    const COLLEGE_LAT = 22.720343216762977; 
-    const COLLEGE_LON = 71.65218912589522;
-    const MAX_DISTANCE = 0.35; 
-
-    const students = ["1 BAMBHANIYA VARUN", "2 BARAIYA RAMDEV", "3 BAVLIYA JAYDEEPBHAI", "4 BHADANIYA RITAXI", "5 BHUVA YAISHA", "6 CHATUR SNEHA", "7 CHAUHAN KRISHNA", "8 CHAUHAN SMITKUMAR", "9 CHAVDA YASH", "10 DALOLIYA SHILPABEN", "11 DAXINI HETVI", "12 Dumadiya Sanjay", "13 GADHVI HINAL", "15 Gami Rahul", "16 GOSAI POOJA", "17 JAMBUKIYA ASMITABEN", "18 Janadiya Dhiraj", "19 KHAKHI MITALBEN", "20 LIMBADIYA KOMALBEN", "21 MAHERIYA VARSHABEN", "22 MAHERIYA YOGESHKUMAR", "23 MAKWANA DOLLY", "24 MALAKIYA SWITYBEN", "25 MANANI ALKABEN", "26 MANSURI ARMAN", "27 Mehta Vishvaben", "28 MITHAPARA VANRAJBHAI", "29 MORI MANSHI", "30 NAKIYA GEETABEN", "31 NAKIYA NIKITABEN", "32 NAKIYA SIDDHIBEN", "33 PALANI JAHANVIBEN", "34 Parmar Aman", "35 PARMAR ARTI", "36 PARMAR RESHMA", "37 RANA MADHAVSINH", "38 RATHOD KISMATBEN", "39 RATHOD NARENDRABHAI", "40 JADAV PRIYABEN", "41 Rojasara Kinjal", "42 SARVAIYA JAYESH", "43 SATANI AASHISHKUMAR", "44 SOLANKI HITIXA", "45 SOLANKI JAYSHRIBEN", "46 SOLANKI VAIBHAV", "47 Sumra Farhin", "48 THIM ZEEYA", "49 CHAUHAN TEJASHREEBEN", "50 TRIVEDI NISHTHA", "51 VAGHELA DEVANSHIBA", "52 Vakhariya Dhara", "53 ZALA KOMALBA"];
-
-    const todayKey = "mmsce_lock_" + new Date().toLocaleDateString();
-    const chime = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
-    let canMark = false;
-    const quotes = ["Education is the most powerful weapon which you can use to change the world.", "શિક્ષણ એ જીવનની તૈયારી નથી; શિક્ષણ એ પતે જ જીવન છે.", "शिक्षा सबसे शक्तिशाली हथियार है जिससे आप दुनिया बदल सकते हैं।", "Learning is a treasure that will follow its owner everywhere.", "ज्ञान ही शक्ति है।"];
+    const COLLEGE_LAT = 22.7230; 
+    const COLLEGE_LON = 71.6350; 
+    const MAX_DIST = 0.3; // 300m
 
     function isTimeValid() {
         const now = new Date();
-        const day = now.getDay(); 
-        const currentTime = now.getHours() + now.getMinutes() / 60;
-
-        if (day === 0 && CLOSE_ON_SUNDAY) return false; 
-        if (day === 6) { 
-            return currentTime >= SATURDAY_START && currentTime <= SATURDAY_END;
-        }
-        return currentTime >= WEEKDAY_START && currentTime <= WEEKDAY_END;
+        const hrs = now.getHours() + (now.getMinutes() / 60);
+        return (hrs >= 11.25 && hrs <= 12.5); // 11:15 - 12:30
     }
 
     window.onload = function() {
-        if (localStorage.getItem(todayKey) === "locked") {
-            displayQuote();
-            showSuccess();
-            return;
-        }
-        if (!isTimeValid()) {
-            document.getElementById('mainEnterBtn').style.display = 'none';
-            document.getElementById('timeWarning').innerText = "Portal Closed (Check Schedule).";
+        document.getElementById('quoteDisplay').innerText = '"' + quotes[Math.floor(Math.random() * quotes.length)] + '"';
+        const lock = localStorage.getItem("locked_" + new Date().toLocaleDateString());
+        if (lock) {
+            document.getElementById('mainBtn').disabled = true;
+            document.getElementById('statusMsg').innerText = "Presence already marked!";
+        } else if (!isTimeValid()) {
+            document.getElementById('mainBtn').disabled = true;
+            document.getElementById('timeWarning').innerText = "Portal Closed (11:15 AM - 12:30 PM)";
         }
     };
 
-    function startSystem() {
-        document.getElementById('welcomeScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        initGPS();
-        renderGrid();
-    }
-
-    function showSuccess() {
-        document.getElementById('welcomeScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'none';
-        document.getElementById('successScreen').style.display = 'flex';
-    }
-
-    function displayQuote() {
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-        document.getElementById('quoteDisplay').innerText = "“ " + randomQuote + " ”";
-    }
-
-    function initGPS() {
+    function getLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updateLocation, handleGPSError, {enableHighAccuracy: true});
+            navigator.geolocation.getCurrentPosition(pos => {
+                const d = Math.sqrt(Math.pow(pos.coords.latitude - COLLEGE_LAT, 2) + Math.pow(pos.coords.longitude - COLLEGE_LON, 2)) * 111;
+                if (d <= MAX_DIST) submit();
+                else alert("Please mark attendance from inside the college campus!");
+            }, () => alert("GPS is required for attendance. Please enable location."));
         }
     }
 
-    function handleGPSError() {
-        document.getElementById('locationStatus').innerText = "❌ GPS Error: Enable Location & Refresh";
-        document.getElementById('locationStatus').className = "off-campus";
-    }
+    function submit() {
+        const name = document.getElementById('studentSelect').value;
+        if (!name) return alert("Select your name!");
+        
+        document.getElementById('mainBtn').disabled = true;
+        document.getElementById('statusMsg').innerText = "Saving to sheet...";
 
-    function updateLocation(pos) {
-        const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, COLLEGE_LAT, COLLEGE_LON);
-        const statusDiv = document.getElementById('locationStatus');
-        if (dist <= MAX_DISTANCE) {
-            statusDiv.innerText = "📍 ON CAMPUS - READY";
-            statusDiv.className = "on-campus";
-            canMark = true;
-        } else {
-            statusDiv.innerText = "❌ OUTSIDE COLLEGE (" + (dist * 1000).toFixed(0) + "m)";
-            statusDiv.className = "off-campus";
-            canMark = false;
-        }
-    }
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; 
-        const dLat = (lat2-lat1) * Math.PI / 180;
-        const dLon = (lon2-lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    function renderGrid() {
-        const grid = document.getElementById('attendanceGrid');
-        grid.innerHTML = "";
-        students.forEach((name) => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<div class="name-text">${name}</div><button class="btn-p" onclick="mark('${name}', this)">P</button>`;
-            grid.appendChild(card);
+        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({name: name, status: "P"}) })
+        .then(() => {
+            document.getElementById('statusMsg').innerHTML = "<span style='color:green;'>✅ Attendance Recorded!</span>";
+            localStorage.setItem("locked_" + new Date().toLocaleDateString(), "true");
         });
-    }
-
-    function filterStudents() {
-        const input = document.getElementById('studentSearch').value.toUpperCase();
-        const cards = document.getElementsByClassName('card');
-        for (let i = 0; i < cards.length; i++) {
-            const name = cards[i].innerText.toUpperCase();
-            cards[i].style.display = name.indexOf(input) > -1 ? "flex" : "none";
-        }
-    }
-
-    async function mark(name, btn) {
-        if (!canMark) return alert("GPS Error: You must be on campus.");
-        btn.innerText = "⌛..."; 
-        btn.disabled = true;
-        let success = false;
-        for (let i = 0; i < 3; i++) {
-            try {
-                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ name: name, status: 'P' }) });
-                success = true;
-                break; 
-            } catch (err) { console.log("Retry " + (i+1)); }
-        }
-        if (success) {
-            localStorage.setItem(todayKey, "locked");
-            chime.play();
-            displayQuote();
-            showSuccess();
-        } else {
-            alert("Connection Failed. Try again.");
-            btn.innerText = "P";
-            btn.disabled = false;
-        }
     }
 </script>
 </body>
